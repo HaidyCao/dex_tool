@@ -18,4 +18,6 @@ void dex_show_method_by_index_to_java(DexHeader *header, u4 index, u4 access_fla
                                       bool show_arg,
                                       const char *prefix);
 
+wchar_t *dex_get_method_for_bytecode(DexHeader *header, u4 index);
+
 #endif //DEX_TOOL_DEX_METHOD_H

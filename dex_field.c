@@ -53,3 +53,11 @@ void dex_show_field_by_index_to_java(DexHeader *header, u4 index, u4 access_flag
     dex_release_utf8(name);
     free(java_type);
 }
+
+wchar_t *dex_get_field_name(DexHeader *header, u4 index) {
+    void *data = header;
+    DexFieldId *ids = data + header->field_ids.offset;
+    DexFieldId id = ids[index];
+
+    return dex_get_string_by_index(header, id.name_idx);
+}

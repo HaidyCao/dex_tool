@@ -7,4 +7,6 @@
 
 #include "dex_defs.h"
 
+char *dex_parse_code(DexHeader *header, const u1 **data, u4 *code_size);
+
 #endif //DEX_TOOL_DEX_BYTECODE_H

@@ -57,3 +57,35 @@ void dex_show_method_by_index_to_java(DexHeader *header, u4 index, u4 access_fla
     dex_show_proto_to_java(header, method.proto_idx, access_flags, method_name, show_arg, new_prefix);
     free(method_name);
 }
+
+wchar_t *dex_get_method_for_bytecode(DexHeader *header, u4 index) {
+    void *data = header;
+
+    DexMethod *methods = data + header->method_ids.offset;
+    DexMethod method = methods[index];
+
+    DexWCharBuffer buffer;
+    dex_DexWCharBuffer_init(&buffer, 1024);
+
+    wchar_t *class_type = dex_string_copy_and_release_old(dex_get_type_desc_by_index(header, method.class_idx));
+    wchar_t *name = dex_string_copy_and_release_old(dex_get_string_by_index(header, method.name_idx));
+    wchar_t *return_type = dex_get_proto_for_bytecode(header, method.proto_idx);
+
+    if (class_type == NULL || name == NULL || return_type == NULL) {
+        free(class_type);
+        free(name);
+        free(return_type);
+        return NULL;
+    }
+
+    dex_DexWCharBuffer_append(&buffer, class_type);
+    dex_DexWCharBuffer_append(&buffer, L"->");
+    dex_DexWCharBuffer_append(&buffer, name);
+    dex_DexWCharBuffer_append(&buffer, return_type);
+
+    free(class_type);
+    free(name);
+    free(return_type);
+
+    return buffer.buf;
+}

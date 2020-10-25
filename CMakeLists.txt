@@ -21,4 +21,5 @@ add_executable(
         dex_annotation.c
         dex_code.c
         dex_bytecode.c
+        dex_map.c
 )

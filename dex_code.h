@@ -7,6 +7,6 @@
 
 #include "dex_defs.h"
 
-void dex_show_code(DexHeader *header, u4 offset);
+void dex_show_code(DexHeader *header, u4 offset, char *prefix);
 
 #endif //DEX_TOOL_DEX_CODE_H

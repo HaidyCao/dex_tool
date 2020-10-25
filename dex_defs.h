@@ -7,10 +7,13 @@
 
 #include <stdbool.h>
 #include <regex.h>
+#include <stdlib.h>
+#include <inttypes.h>
 
 #define u1 unsigned char
 #define u2 unsigned short
 #define u4 unsigned int
+#define u8 uint64_t
 
 typedef struct {
     u4 size;
@@ -165,6 +168,18 @@ typedef struct {
     DexEncodedTypeAddrPair *handlers;
     u4 catch_all_addr;
 } DexEncodedCacheHandler;
+
+typedef struct {
+    u2 type;
+    u2 _;
+    u4 size;
+    u4 offset;
+} DexMap;
+
+typedef struct {
+    u4 size;
+    DexMap list[];
+} DexMapList;
 
 DexArgs *dex_get_args();
 

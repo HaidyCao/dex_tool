@@ -14,4 +14,6 @@ void dex_show_proto_by_index(DexHeader *header, u4 index, const char *prefix);
 void dex_show_proto_to_java(DexHeader *header, u4 index, u4 access_flags, wchar_t *method, bool show_arg,
                             const char *prefix);
 
+wchar_t *dex_get_proto_for_bytecode(DexHeader *header, u4 index);
+
 #endif //DEX_TOOL_DEX_PROTO_H

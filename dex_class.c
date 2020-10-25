@@ -153,7 +153,10 @@ void dex_show_class_data(DexHeader *header, u4 offset, const char *prefix, DexOp
                                              class_data->direct_methods[i].access_flags, false, new_prefix);
             u4 code_off = class_data->direct_methods[i].code_off;
             if (options != NULL && options->show_code && code_off != 0) {
-                dex_show_code(header, code_off);
+                char code_prefix[strlen(dex_fix_prefix(new_prefix)) + 2];
+                sprintf(code_prefix, "%s\t", dex_fix_prefix(new_prefix));
+
+                dex_show_code(header, code_off, code_prefix);
             }
             printf("\n");
         }

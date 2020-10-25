@@ -3,11 +3,13 @@
 //
 #include <stddef.h>
 #include <stdlib.h>
+#include <strings.h>
 
 #include "dex_proto.h"
 #include "dex_string.h"
 #include "dex_type.h"
 #include "dex_utils.h"
+#include "dex_log.h"
 
 void dex_show_proto(DexHeader *header) {
     u4 p_index;
@@ -107,4 +109,37 @@ void dex_show_proto_to_java(DexHeader *header, u4 index, u4 access_flags, wchar_
     }
 
     printf(")");
+}
+
+
+wchar_t *dex_get_proto_for_bytecode(DexHeader *header, u4 index) {
+    void *data = header;
+    DexProtoId *ids = data + header->proto_ids.offset;
+    if (index > header->proto_ids.size) {
+        LOGW("get proto out of range: index = %d, size = %d", index, header->proto_ids.size);
+        return NULL;
+    }
+    DexProtoId id = ids[index];
+
+    DexWCharBuffer buf;
+    dex_DexWCharBuffer_init(&buf, 1024);
+
+    dex_DexWCharBuffer_append(&buf, L"(");
+
+    if (id.parameters_off > 0) {
+        DexTypeList *type_list = data + id.parameters_off;
+        for (int i = 0; i < type_list->size; ++i) {
+            wchar_t *str = dex_get_type_desc_by_index(header, type_list->list[i].type_idx);
+            dex_DexWCharBuffer_append(&buf, str);
+            dex_release_utf8(str);
+        }
+    }
+
+    dex_DexWCharBuffer_append(&buf, L")");
+
+    wchar_t *return_type = dex_get_type_desc_by_index(header, id.return_type_idx);
+    dex_DexWCharBuffer_append(&buf, return_type);
+    dex_release_utf8(return_type);
+
+    return buf.buf;
 }

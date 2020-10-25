@@ -3,13 +3,15 @@
 //
 #include <stdlib.h>
 #include <stddef.h>
+#include <stdio.h>
 
 #include "dex_code.h"
 #include "c_hex_utils.h"
+#include "dex_bytecode.h"
 
-#define CODE_HEADER_LENGTH 12
+#define CODE_HEADER_LENGTH 16
 
-void dex_show_code(DexHeader *header, u4 offset) {
+void dex_show_code(DexHeader *header, u4 offset, char *prefix) {
     void *data = header;
     DexCode *code = data + offset;
 
@@ -23,5 +25,17 @@ void dex_show_code(DexHeader *header, u4 offset) {
         tries = (DexTry *) code_data;
     }
 
-    hex_dump(code->insns, sizeof(u2) * code->insns_size, 0);
+//    hex_dump(code->insns, sizeof(u2) * code->insns_size, 0);
+
+    u4 parsed_size = 0;
+    while (parsed_size < code->insns_size) {
+        u4 code_size = 0;
+        char *bytecode = dex_parse_code(header, &code_data, &code_size);
+
+        printf("\n%s\t%s", dex_fix_prefix(prefix), bytecode);
+        parsed_size += code_size;
+        free(bytecode);
+    }
+
+//    exit(-1);
 }
