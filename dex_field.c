@@ -61,3 +61,30 @@ wchar_t *dex_get_field_name(DexHeader *header, u4 index) {
 
     return dex_get_string_by_index(header, id.name_idx);
 }
+
+wchar_t *dex_get_field_name_for_bytecode(DexHeader *header, u4 index) {
+    void *data = header;
+    DexFieldId *ids = data + header->field_ids.offset;
+    DexFieldId id = ids[index];
+
+    DexWCharBuffer buffer;
+    dex_DexWCharBuffer_init(&buffer, 1024);
+
+    wchar_t *class_name = dex_get_type_desc_by_index(header, id.class_idx);
+    dex_DexWCharBuffer_append(&buffer, class_name);
+    dex_release_utf8(class_name);
+
+    dex_DexWCharBuffer_append(&buffer, L"->");
+
+    wchar_t *name = dex_get_string_by_index(header, id.name_idx);
+    dex_DexWCharBuffer_append(&buffer, name);
+    dex_release_utf8(name);
+
+    dex_DexWCharBuffer_append(&buffer, L":");
+
+    wchar_t *type_name = dex_get_type_desc_by_index(header, id.type_idx);
+    dex_DexWCharBuffer_append(&buffer, type_name);
+    dex_release_utf8(type_name);
+
+    return buffer.buf;
+}

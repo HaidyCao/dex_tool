@@ -134,7 +134,7 @@ static BytecodeOp bytecode_ops[] = {
         {0x17, "const-wide/32 v%d, %x",                           "31i",  FORMAT_NOT_FOUNT, NULL},
         {0x18, "const-wide v%d, %" PRId64,                        "51l",  FORMAT_NOT_FOUNT, NULL},
         {0x19, "const-wide/high16 v%d, %" PRId64,                 "21h",  FORMAT_NOT_FOUNT, NULL},
-        {0x1a, "const-string v%d, %ls",                           "21c",  FORMAT_NOT_FOUNT, "const-string vAA, string@BBBB"},
+        {0x1a, "const-string v%d, \"%ls\"",                           "21c",  FORMAT_NOT_FOUNT, "const-string vAA, string@BBBB"},
         {0x1b, "const-string/jumbo v%d, \"%ls\"",                 "31c",  FORMAT_NOT_FOUNT, "const-string/jumbo vAA, string@BBBBBBBB"},
         {0x1c, "const-class v%d, %ls",                            "21c",  FORMAT_NOT_FOUNT, "const-class vAA, type@BBBB"},
         {0x1d, "monitor-enter v%d",                               "11x",  FORMAT_NOT_FOUNT, NULL},
@@ -143,16 +143,16 @@ static BytecodeOp bytecode_ops[] = {
         {0x20, "instance-of v%d, v%d, %ls",                       "22c",  FORMAT_NOT_FOUNT, "instance-of vA, vB, type@CCCC"},
         {0x21, "array-length v%d, v%d",                           "12x",  FORMAT_NOT_FOUNT, NULL},
         {0x22, "new-instance v%d, %ls",                           "21c",  FORMAT_NOT_FOUNT, "new-instance vAA, type@BBBB"},
-        {0x23, "new-array v%d, v%d, %ls",                          "21c",  FORMAT_NOT_FOUNT, "filled-new-array {vC, vD, vE, vF, vG}, type@BBBB"},
+        {0x23, "new-array v%d, v%d, %ls",                         "22c",  FORMAT_NOT_FOUNT, "new-array vA, vB, type@CCCC"},
         {0x24, "filled-new-array {%s}, %ls",                      "35c",  FORMAT_NOT_FOUNT, "filled-new-array/range {vCCCC .. vNNNN}, type@BBBB"},
         {0x25, "filled-new-array/range {v%d .. v%d}, %ls",        "3rc",  FORMAT_NOT_FOUNT, NULL},
         {0x26, "fill-array-data v%d, %" PRId64,                   "31t",  FORMAT_NOT_FOUNT, NULL},
         {0x27, "throw v%d",                                       "11x",  FORMAT_NOT_FOUNT, NULL},
-        {0x28, "goto 0x%x",                                         "10t",  FORMAT_NOT_FOUNT, NULL},
-        {0x29, "goto/16 0x%x",                                      "20t",  FORMAT_NOT_FOUNT, NULL},
-        {0x2a, "goto/32 0x%x",                                      "30t",  FORMAT_NOT_FOUNT, NULL},
-        {0x2b, "packed-switch v%d, 0x%x",                           "31t",  FORMAT_NOT_FOUNT, NULL},
-        {0x2c, "sparse-switch v%d, 0x%x",                           "31t",  FORMAT_NOT_FOUNT, NULL},
+        {0x28, "goto 0x%x",                                       "10t",  FORMAT_NOT_FOUNT, NULL},
+        {0x29, "goto/16 0x%x",                                    "20t",  FORMAT_NOT_FOUNT, NULL},
+        {0x2a, "goto/32 0x%x",                                    "30t",  FORMAT_NOT_FOUNT, NULL},
+        {0x2b, "packed-switch v%d, 0x%x",                         "31t",  FORMAT_NOT_FOUNT, NULL},
+        {0x2c, "sparse-switch v%d, 0x%x",                         "31t",  FORMAT_NOT_FOUNT, NULL},
 
         {0x2d, "cmpl-float v%d, v%d, v%d",                        "23x",  FORMAT_NOT_FOUNT, NULL},
         {0x2e, "cmpg-float v%d, v%d, v%d",                        "23x",  FORMAT_NOT_FOUNT, NULL},
@@ -160,19 +160,19 @@ static BytecodeOp bytecode_ops[] = {
         {0x30, "cmpg-double v%d, v%d, v%d",                       "23x",  FORMAT_NOT_FOUNT, NULL},
         {0x31, "cmp-long v%d, v%d, v%d",                          "23x",  FORMAT_NOT_FOUNT, NULL},
 
-        {0x32, "if-eq v%d, v%d, 0x%x",                              "22t",  FORMAT_NOT_FOUNT, NULL},
-        {0x33, "if-ne v%d, v%d, 0x%x",                              "22t",  FORMAT_NOT_FOUNT, NULL},
-        {0x34, "if-lt v%d, v%d, 0x%x",                              "22t",  FORMAT_NOT_FOUNT, NULL},
-        {0x35, "if-ge v%d, v%d, 0x%x",                              "22t",  FORMAT_NOT_FOUNT, NULL},
-        {0x36, "if-gt v%d, v%d, 0x%x",                              "22t",  FORMAT_NOT_FOUNT, NULL},
-        {0x37, "if-le v%d, v%d, 0x%x",                              "22t",  FORMAT_NOT_FOUNT, NULL},
+        {0x32, "if-eq v%d, v%d, 0x%x",                            "22t",  FORMAT_NOT_FOUNT, NULL},
+        {0x33, "if-ne v%d, v%d, 0x%x",                            "22t",  FORMAT_NOT_FOUNT, NULL},
+        {0x34, "if-lt v%d, v%d, 0x%x",                            "22t",  FORMAT_NOT_FOUNT, NULL},
+        {0x35, "if-ge v%d, v%d, 0x%x",                            "22t",  FORMAT_NOT_FOUNT, NULL},
+        {0x36, "if-gt v%d, v%d, 0x%x",                            "22t",  FORMAT_NOT_FOUNT, NULL},
+        {0x37, "if-le v%d, v%d, 0x%x",                            "22t",  FORMAT_NOT_FOUNT, NULL},
 
-        {0x38, "if-eqz v%d, 0x%x",                                  "21t",  FORMAT_NOT_FOUNT, NULL},
-        {0x39, "if-nez v%d, 0x%x",                                  "21t",  FORMAT_NOT_FOUNT, NULL},
-        {0x3a, "if-ltz v%d, 0x%x",                                  "21t",  FORMAT_NOT_FOUNT, NULL},
-        {0x3b, "if-gez v%d, 0x%x",                                  "21t",  FORMAT_NOT_FOUNT, NULL},
-        {0x3c, "if-gtz v%d, 0x%x",                                  "21t",  FORMAT_NOT_FOUNT, NULL},
-        {0x3d, "if-lez v%d, 0x%x",                                  "21t",  FORMAT_NOT_FOUNT, NULL},
+        {0x38, "if-eqz v%d, 0x%x",                                "21t",  FORMAT_NOT_FOUNT, NULL},
+        {0x39, "if-nez v%d, 0x%x",                                "21t",  FORMAT_NOT_FOUNT, NULL},
+        {0x3a, "if-ltz v%d, 0x%x",                                "21t",  FORMAT_NOT_FOUNT, NULL},
+        {0x3b, "if-gez v%d, 0x%x",                                "21t",  FORMAT_NOT_FOUNT, NULL},
+        {0x3c, "if-gtz v%d, 0x%x",                                "21t",  FORMAT_NOT_FOUNT, NULL},
+        {0x3d, "if-lez v%d, 0x%x",                                "21t",  FORMAT_NOT_FOUNT, NULL},
 
         {0x3e, "",                                                "10x",  FORMAT_NOT_FOUNT, NULL},
         {0x3f, "",                                                "10x",  FORMAT_NOT_FOUNT, NULL},
@@ -331,26 +331,26 @@ static BytecodeOp bytecode_ops[] = {
         {0xce, "div-double/2addr v%d, v%d",                       "12x",  FORMAT_NOT_FOUNT, NULL},
         {0xcf, "rem-double/2addr v%d, v%d",                       "12x",  FORMAT_NOT_FOUNT, NULL},
 
-        {0xd0, "add-int/lit16 v%d, v%d, 0x%x",                      "22s",  FORMAT_NOT_FOUNT, NULL},
-        {0xd1, "rsub-int v%d, v%d, 0x%x",                           "22s",  FORMAT_NOT_FOUNT, NULL},
-        {0xd2, "mul-int/lit16 v%d, v%d, 0x%x",                      "22s",  FORMAT_NOT_FOUNT, NULL},
-        {0xd3, "div-int/lit16 v%d, v%d, 0x%x",                      "22s",  FORMAT_NOT_FOUNT, NULL},
-        {0xd4, "rem-int/lit16 v%d, v%d, 0x%x",                      "22s",  FORMAT_NOT_FOUNT, NULL},
-        {0xd5, "and-int/lit16 v%d, v%d, 0x%x",                      "22s",  FORMAT_NOT_FOUNT, NULL},
-        {0xd6, "or-int/lit16 v%d, v%d, 0x%x",                       "22s",  FORMAT_NOT_FOUNT, NULL},
-        {0xd7, "xor-int/lit16 v%d, v%d, 0x%x",                      "22s",  FORMAT_NOT_FOUNT, NULL},
+        {0xd0, "add-int/lit16 v%d, v%d, 0x%x",                    "22s",  FORMAT_NOT_FOUNT, NULL},
+        {0xd1, "rsub-int v%d, v%d, 0x%x",                         "22s",  FORMAT_NOT_FOUNT, NULL},
+        {0xd2, "mul-int/lit16 v%d, v%d, 0x%x",                    "22s",  FORMAT_NOT_FOUNT, NULL},
+        {0xd3, "div-int/lit16 v%d, v%d, 0x%x",                    "22s",  FORMAT_NOT_FOUNT, NULL},
+        {0xd4, "rem-int/lit16 v%d, v%d, 0x%x",                    "22s",  FORMAT_NOT_FOUNT, NULL},
+        {0xd5, "and-int/lit16 v%d, v%d, 0x%x",                    "22s",  FORMAT_NOT_FOUNT, NULL},
+        {0xd6, "or-int/lit16 v%d, v%d, 0x%x",                     "22s",  FORMAT_NOT_FOUNT, NULL},
+        {0xd7, "xor-int/lit16 v%d, v%d, 0x%x",                    "22s",  FORMAT_NOT_FOUNT, NULL},
 
-        {0xd8, "add-int/lit8 v%d, v%d, 0x%x",                       "22b",  FORMAT_NOT_FOUNT, NULL},
-        {0xd9, "rsub-int/lit8 v%d, v%d, 0x%x",                      "22b",  FORMAT_NOT_FOUNT, NULL},
-        {0xda, "mul-int/lit8 v%d, v%d, 0x%x",                       "22b",  FORMAT_NOT_FOUNT, NULL},
-        {0xdb, "div-int/lit8 v%d, v%d, 0x%x",                       "22b",  FORMAT_NOT_FOUNT, NULL},
-        {0xdc, "rem-int/lit8 v%d, v%d, 0x%x",                       "22b",  FORMAT_NOT_FOUNT, NULL},
-        {0xdd, "and-int/lit8 v%d, v%d, 0x%x",                       "22b",  FORMAT_NOT_FOUNT, NULL},
-        {0xde, "or-int/lit8 v%d, v%d, 0x%x",                        "22b",  FORMAT_NOT_FOUNT, NULL},
-        {0xdf, "xor-int/lit8 v%d, v%d, 0x%x",                       "22b",  FORMAT_NOT_FOUNT, NULL},
-        {0xe0, "shl-int/lit8 v%d, v%d, 0x%x",                       "22b",  FORMAT_NOT_FOUNT, NULL},
-        {0xe1, "shr-int/lit8 v%d, v%d, 0x%x",                       "22b",  FORMAT_NOT_FOUNT, NULL},
-        {0xe2, "ushr-int/lit8 v%d, v%d, 0x%x",                      "22b",  FORMAT_NOT_FOUNT, NULL},
+        {0xd8, "add-int/lit8 v%d, v%d, 0x%x",                     "22b",  FORMAT_NOT_FOUNT, NULL},
+        {0xd9, "rsub-int/lit8 v%d, v%d, 0x%x",                    "22b",  FORMAT_NOT_FOUNT, NULL},
+        {0xda, "mul-int/lit8 v%d, v%d, 0x%x",                     "22b",  FORMAT_NOT_FOUNT, NULL},
+        {0xdb, "div-int/lit8 v%d, v%d, 0x%x",                     "22b",  FORMAT_NOT_FOUNT, NULL},
+        {0xdc, "rem-int/lit8 v%d, v%d, 0x%x",                     "22b",  FORMAT_NOT_FOUNT, NULL},
+        {0xdd, "and-int/lit8 v%d, v%d, 0x%x",                     "22b",  FORMAT_NOT_FOUNT, NULL},
+        {0xde, "or-int/lit8 v%d, v%d, 0x%x",                      "22b",  FORMAT_NOT_FOUNT, NULL},
+        {0xdf, "xor-int/lit8 v%d, v%d, 0x%x",                     "22b",  FORMAT_NOT_FOUNT, NULL},
+        {0xe0, "shl-int/lit8 v%d, v%d, 0x%x",                     "22b",  FORMAT_NOT_FOUNT, NULL},
+        {0xe1, "shr-int/lit8 v%d, v%d, 0x%x",                     "22b",  FORMAT_NOT_FOUNT, NULL},
+        {0xe2, "ushr-int/lit8 v%d, v%d, 0x%x",                    "22b",  FORMAT_NOT_FOUNT, NULL},
 
         {0xe3, "",                                                "10x",  FORMAT_NOT_FOUNT, NULL},
         {0xe4, "",                                                "10x",  FORMAT_NOT_FOUNT, NULL},
@@ -505,7 +505,7 @@ handle_format_args(DexHeader *header, CodeValue *args, uint64_t *format_args, u1
                     dex_get_type_desc_by_index(header, args[arg_index].v));
             break;
         case CODE_KIND_FIELD:
-            args[arg_index].ptr = dex_string_copy_and_release_old(dex_get_field_name(header, args[arg_index].v));
+            args[arg_index].ptr = dex_get_field_name_for_bytecode(header, args[arg_index].v);
             break;
         case CODE_KIND_METH:
             args[arg_index].ptr = dex_get_method_for_bytecode(header, args[arg_index].v);
@@ -624,8 +624,6 @@ static char *parse_code(DexHeader *header, DalvikFormat *format, const u1 **data
     u1 format_arg_count = args_size;
     uint64_t format_args[10];
     if (op->format_id[1] == '5') {
-//        format_arg_count -= (5 - args[0].v);
-//        handle_print_args(header, args, format_args, op);
         format_arg_count -= 5;
 
         char format_tmp[16];
@@ -687,6 +685,12 @@ static char *parse_code(DexHeader *header, DalvikFormat *format, const u1 **data
     } else {
 
     }
+
+    // free args
+    for (int i = 0; i < args_size; ++i) {
+        free(args[i].ptr);
+    }
+
     return bytecode;
 }
 
