@@ -126,15 +126,15 @@ static BytecodeOp bytecode_ops[] = {
         {0x0f, "return v%d",                                      "11x",  FORMAT_NOT_FOUNT, NULL},
         {0x10, "return-wide v%d",                                 "11x",  FORMAT_NOT_FOUNT, NULL},
         {0x11, "return-object v%d",                               "11x",  FORMAT_NOT_FOUNT, NULL},
-        {0x12, "const/4 v%d, %x",                                 "11n",  FORMAT_NOT_FOUNT, NULL},
-        {0x13, "const/16 v%d, %x",                                "21s",  FORMAT_NOT_FOUNT, NULL},
-        {0x14, "const v%d, %x",                                   "31i",  FORMAT_NOT_FOUNT, NULL},
-        {0x15, "const/high16 v%d, %x",                            "21h",  FORMAT_NOT_FOUNT, NULL},
-        {0x16, "const-wide/16 v%d, %x",                           "21s",  FORMAT_NOT_FOUNT, NULL},
-        {0x17, "const-wide/32 v%d, %x",                           "31i",  FORMAT_NOT_FOUNT, NULL},
-        {0x18, "const-wide v%d, %" PRId64,                        "51l",  FORMAT_NOT_FOUNT, NULL},
-        {0x19, "const-wide/high16 v%d, %" PRId64,                 "21h",  FORMAT_NOT_FOUNT, NULL},
-        {0x1a, "const-string v%d, \"%ls\"",                           "21c",  FORMAT_NOT_FOUNT, "const-string vAA, string@BBBB"},
+        {0x12, "const/4 v%d, 0x%x",                               "11n",  FORMAT_NOT_FOUNT, NULL},
+        {0x13, "const/16 v%d, 0x%x",                              "21s",  FORMAT_NOT_FOUNT, NULL},
+        {0x14, "const v%d, 0x%x",                                 "31i",  FORMAT_NOT_FOUNT, NULL},
+        {0x15, "const/high16 v%d, 0x%x",                          "21h",  FORMAT_NOT_FOUNT, NULL},
+        {0x16, "const-wide/16 v%d, 0x%x",                         "21s",  FORMAT_NOT_FOUNT, NULL},
+        {0x17, "const-wide/32 v%d, 0x%x",                         "31i",  FORMAT_NOT_FOUNT, NULL},
+        {0x18, "const-wide v%d, 0x%" PRId64,                      "51l",  FORMAT_NOT_FOUNT, NULL},
+        {0x19, "const-wide/high16 v%d, 0x%" PRId64,               "21h",  FORMAT_NOT_FOUNT, NULL},
+        {0x1a, "const-string v%d, \"%ls\"",                       "21c",  FORMAT_NOT_FOUNT, "const-string vAA, string@BBBB"},
         {0x1b, "const-string/jumbo v%d, \"%ls\"",                 "31c",  FORMAT_NOT_FOUNT, "const-string/jumbo vAA, string@BBBBBBBB"},
         {0x1c, "const-class v%d, %ls",                            "21c",  FORMAT_NOT_FOUNT, "const-class vAA, type@BBBB"},
         {0x1d, "monitor-enter v%d",                               "11x",  FORMAT_NOT_FOUNT, NULL},
@@ -146,7 +146,7 @@ static BytecodeOp bytecode_ops[] = {
         {0x23, "new-array v%d, v%d, %ls",                         "22c",  FORMAT_NOT_FOUNT, "new-array vA, vB, type@CCCC"},
         {0x24, "filled-new-array {%s}, %ls",                      "35c",  FORMAT_NOT_FOUNT, "filled-new-array/range {vCCCC .. vNNNN}, type@BBBB"},
         {0x25, "filled-new-array/range {v%d .. v%d}, %ls",        "3rc",  FORMAT_NOT_FOUNT, NULL},
-        {0x26, "fill-array-data v%d, %" PRId64,                   "31t",  FORMAT_NOT_FOUNT, NULL},
+        {0x26, "fill-array-data v%d, %s",                         "31t",  FORMAT_NOT_FOUNT, NULL},
         {0x27, "throw v%d",                                       "11x",  FORMAT_NOT_FOUNT, NULL},
         {0x28, "goto 0x%x",                                       "10t",  FORMAT_NOT_FOUNT, NULL},
         {0x29, "goto/16 0x%x",                                    "20t",  FORMAT_NOT_FOUNT, NULL},
@@ -538,8 +538,81 @@ static void handle_print_args(DexHeader *header, CodeValue *args, uint64_t *form
     }
 }
 
-static char *parse_code(DexHeader *header, DalvikFormat *format, const u1 **data, BytecodeOp *op) {
-    const u1 *ptr = *data;
+static char *parse_fill_array_data_payload(DexBytecodeContext *context) {
+    const u1 *ptr = context->code + context->code_index;
+    DexFillArrayDataPayload *payload = (DexFillArrayDataPayload *) ptr;
+
+    char str[(4 + payload->element_width * 2) * payload->size + 1];
+    str[0] = '\0';
+    char item[4 + payload->element_width * 2];
+    if (payload->element_width == 1) {
+        u1 *array = (u1 *) payload->data;
+        for (int i = 0; i < payload->size; ++i) {
+            sprintf(item, "-0x%x", array[i]);
+            sprintf(str, "%s%s\n", str, item);
+        }
+    } else if (payload->element_width == 2) {
+        u2 *array = (u2 *) payload->data;
+        for (int i = 0; i < payload->size; ++i) {
+            sprintf(item, "-0x%x", array[i]);
+            sprintf(str, "%s%s\n", str, item);
+        }
+    } else if (payload->element_width == 4) {
+        u4 *array = (u4 *) payload->data;
+        for (int i = 0; i < payload->size; ++i) {
+            sprintf(item, "0x%" PRIx32, array[i]);
+            sprintf(str, "%s%s\n", str, item);
+        }
+    } else if (payload->element_width == 8) {
+        u8 *array = (u8 *) payload->data;
+        for (int i = 0; i < payload->size; ++i) {
+            sprintf(item, "0x%" PRIx64, array[i]);
+            sprintf(str, "%s%s\n", str, item);
+        }
+    }
+
+    char *name = NULL;
+    if (context->array != NULL) {
+        for (int i = 0; i < context->array_size; ++i) {
+            if (context->code_index == context->array[i].offset) {
+                name = context->array[i].name;
+            }
+        }
+    }
+
+    if (name == NULL) {
+        LOGE("find name failed");
+    }
+
+    char *result = NULL;
+    asprintf(&result, ":%s\n.array-data %d\n%s.end array-data", name, payload->element_width, str);
+
+    context->code_index += (payload->size * payload->element_width + 1) + 8;
+    return result;
+}
+
+static char *parse_pseudo_instruction(DexBytecodeContext *context) {
+    typedef struct {
+        u2 code;
+    } Ident;
+    Ident *ident = (Ident *) (context->code + context->code_index);
+    if (ident->code == DEX_PSEUDO_OPCODE_FILL_ARRAY_DATA_PAYLOAD) {
+        return parse_fill_array_data_payload(context);
+    }
+
+    return "not support";
+}
+
+char *dex_parse_code(DexBytecodeContext *context) {
+    const u1 *ptr = context->code + context->code_index;
+
+    BytecodeOp *op = &bytecode_ops[*ptr];
+    DalvikFormat *format = &dalvik_formats[op->format_index];
+
+    if (op->code == 0x00) { // NOP
+        return parse_pseudo_instruction(context);
+    }
+
     char *id = format->id;
 
     u1 reg_size;
@@ -639,21 +712,29 @@ static char *parse_code(DexHeader *header, DalvikFormat *format, const u1 **data
 
         args[0].ptr = strdup(format_tmp);
         format_args[0] = (uint64_t) args[0].ptr;
-        handle_format_args(header, args, format_args, 1, 1); // BBBB
+        handle_format_args(context->header, args, format_args, 1, 1); // BBBB
         // check HHHH
         if (format_arg_count > 2) {
             for (int i = 0; i < format_arg_count - 2; ++i) {
                 u1 format_arg_index = i + 2;
                 u1 arg_index = 'H' - 'A' + i;
-                handle_format_args(header, args, format_args, format_arg_index, arg_index);
+                handle_format_args(context->header, args, format_args, format_arg_index, arg_index);
             }
         }
     } else if (op->format_id[1] == 'r') {
 
     } else {
         for (int i = 0; i < args_size; ++i) {
-            handle_format_args(header, args, format_args, i, i);
+            handle_format_args(context->header, args, format_args, i, i);
         }
+    }
+
+    // change
+    if (op->code == 0x26) { // fill-array-data vAA, +BBBBBBBB
+        char *name = DexBytecodeContext_pseudo_append(context, DEX_PSEUDO_OPCODE_FILL_ARRAY_DATA_PAYLOAD,
+                                                      2 * format_args[1] + context->code_index);
+        asprintf((char **) &args[1].ptr, ":%s", name);
+        format_args[1] = (uint64_t) args[1].ptr;
     }
 
     char *bytecode = NULL;
@@ -691,20 +772,8 @@ static char *parse_code(DexHeader *header, DalvikFormat *format, const u1 **data
         free(args[i].ptr);
     }
 
+    u1 code_size = (op->format_id[0] - '0') * 2;
+    context->code_index += code_size;
+
     return bytecode;
-}
-
-char *dex_parse_code(DexHeader *header, const u1 **data, u4 *code_size) {
-    const u1 *ptr = *data;
-
-    BytecodeOp *op = &bytecode_ops[*ptr];
-    DalvikFormat *format = &dalvik_formats[op->format_index];
-//    LOGT("id = %s\nformat = %s\ncode_format = %s", format->id, format->format, op->code_format);
-
-    char *code = parse_code(header, format, &ptr, op);
-
-    *code_size = op->format_id[0] - '0';
-    ptr += (*code_size * 2);
-    *data = ptr;
-    return code;
 }

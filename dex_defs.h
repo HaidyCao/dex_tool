@@ -181,6 +181,33 @@ typedef struct {
     DexMap list[];
 } DexMapList;
 
+typedef struct {
+    u4 offset;
+    char *name;
+} DexBytecodePseudoItem;
+
+typedef struct {
+    DexHeader *header;
+    const void *code;
+    u4 code_index;
+
+    u4 array_size;
+    DexBytecodePseudoItem *array;
+} DexBytecodeContext;
+
+void DexBytecodeContext_init(DexBytecodeContext *context, DexHeader *header, const void *code);
+
+char *DexBytecodeContext_pseudo_append(DexBytecodeContext *context, u2 type, u4 offset);
+
+#define DEX_PSEUDO_OPCODE_FILL_ARRAY_DATA_PAYLOAD   0x0300
+
+typedef struct {
+    u2 ident;
+    u2 element_width;
+    u4 size;
+    u1 data[];
+} DexFillArrayDataPayload;
+
 DexArgs *dex_get_args();
 
 void dex_init_options(DexOptions *options);

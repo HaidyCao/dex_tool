@@ -26,14 +26,13 @@ void dex_show_code(DexHeader *header, u4 offset, char *prefix) {
     }
 
 //    hex_dump(code->insns, sizeof(u2) * code->insns_size, 0);
+    DexBytecodeContext context;
+    DexBytecodeContext_init(&context, header, code_data);
 
-    u4 parsed_size = 0;
-    while (parsed_size < code->insns_size) {
-        u4 code_size = 0;
-        char *bytecode = dex_parse_code(header, &code_data, &code_size);
+    while (context.code_index / 2 < code->insns_size) {
+        char *bytecode = dex_parse_code(&context);
 
         printf("\n%s\t%s", dex_fix_prefix(prefix), bytecode);
-        parsed_size += code_size;
         free(bytecode);
     }
 
