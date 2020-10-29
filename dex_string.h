@@ -28,6 +28,8 @@ void dex_DexWCharBuffer_init(DexWCharBuffer *buffer, size_t size);
 
 bool dex_DexWCharBuffer_append(DexWCharBuffer *buffer, wchar_t *str);
 
+wchar_t *dex_wstring_escape(wchar_t *str);
+
 wchar_t *dex_string_resize(wchar_t *str, size_t old_len, size_t target, size_t *new_len);
 
 #endif //DEX_TOOL_DEX_STRING_H

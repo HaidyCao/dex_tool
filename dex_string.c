@@ -190,3 +190,22 @@ bool dex_DexWCharBuffer_append(DexWCharBuffer *buffer, wchar_t *str) {
     wcscat(buffer->buf, str);
     return true;
 }
+
+wchar_t *dex_wstring_escape(wchar_t *str) {
+    size_t len = wcslen(str);
+    wchar_t escaped[len + 1];
+    ssize_t e_i = 0;
+    for (ssize_t i = 0; i < len; ++i) {
+        wchar_t t = str[i];
+        if (t == L'\a' || t == L'\b' || t == L'\f' || t == L'\n' || t == L'\t' || t == L'\v' || t == L'\\' ||
+            t == L'\?' || t == L'\'' || t == L'\"') {
+            escaped[e_i++] = L'\\';
+            escaped[e_i++] = t;
+        } else {
+            escaped[e_i++] = t;
+        }
+    }
+    escaped[e_i] = L'\0';
+
+    return wcsdup(escaped);
+}

@@ -26,7 +26,6 @@
 #define ARG_CODE    3
 
 static const struct option long_options[] = {
-        {"dex",    required_argument, NULL, 'd'},
         {"header", no_argument,       NULL, 'h'},
         {"string", no_argument,       NULL, 's'},
         {"type",   no_argument,       NULL, 't'},

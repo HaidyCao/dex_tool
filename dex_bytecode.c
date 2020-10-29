@@ -735,6 +735,12 @@ char *dex_parse_code(DexBytecodeContext *context) {
                                                       2 * format_args[1] + context->code_index);
         asprintf((char **) &args[1].ptr, ":%s", name);
         format_args[1] = (uint64_t) args[1].ptr;
+    } else if (op->code == 0x1a ||
+               op->code == 0x1b) { // const-string vAA, string@BBBB AND const-string/jumbo vAA, string@BBBBBBBB
+        wchar_t *escape = dex_wstring_escape(args[1].ptr);
+        free(args[1].ptr);
+        args[1].ptr = escape;
+        format_args[1] = (uint64_t) args[1].ptr;
     }
 
     char *bytecode = NULL;
